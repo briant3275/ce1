@@ -40,6 +40,7 @@ class App extends React.Component {
           
       <main>
         <button onClick={this.handleClick}>Do a Thing</button>
+        {this.state.displayCityData ? cityToRender : ''}
       </main>
       </>
     );
