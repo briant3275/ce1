@@ -9,7 +9,9 @@ class App extends React.Component {
       cityData: [],
       renderError: false,
       errorMessage: '',
-      searchQuery: ''
+      searchQuery: '',
+      cityData: {},
+      showMap: false
     }
   }
 
@@ -40,31 +42,33 @@ class App extends React.Component {
     }
   }
 
-  handleSubmit = e => {
+
+
+  handleInput = e => this.setState({searchQuery: e.target.value,})
+  
+
+  getCityInfo = async (e) => {
     e.preventDefault();
-    let city = e.target.city.value
-      this.setState({
-        searchQuery: e.target.city.value,
-      });
-      this.getCityInfo(city);
-  }
+    //try catch
+    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_ACCESS_TOKEN}&q=${this.state.searchQuery}&format=json`;
 
-  getCityInfo = async (city) => {
-    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_ACCESS_TOKEN}&q=${city}&format=json`;
-
-    console.log(url);
+    // console.log(url);
     let cityResults = await axios.get(url);
 
-    console.log(cityResults.data[0]);
+    // console.log(cityResults.data[0]);
+    this.setState({
+      cityData: cityResults.data[0],
+      displayCityData: true
+    })
   }
 
 
   render() {
-    console.log(this.state.searchQuery);
+    console.log(this.state);
 
-    let cityToRender = this.state.cityData.map((city, idx) => (
-      <p key={idx}>{city.name}</p>
-    ))
+    // let cityToRender = this.state.cityData.map((city, idx) => (
+    //   <p key={idx}>{city.name}</p>
+    // ))
     return (
       <>
         <header>
@@ -72,15 +76,26 @@ class App extends React.Component {
         </header>
 
         <main>
-          <button onClick={this.handleClick}>Do a Thing</button>
-          {this.state.displayCityData ? cityToRender : ''}
-          {this.state.renderError && <p>{this.state.errorMessage}</p>}
-          <form onSubmit={this.handleSubmit}>
+
+          {/* <button onClick={this.handleClick}>Do a Thing</button> */}
+          <form onSubmit={this.getCityInfo}>
             <label>Pick A City!
-              <input type="text" name="city" />
+              <input onInput={this.handleInput}type="text" name="city" />
             </label>
             <button type="submit">Explore!</button>
           </form>
+
+          {
+          this.state.displayCityData &&
+          <article>
+            <h2>{this.state.cityData.display_name}</h2>
+            <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_ACCESS_TOKEN}&zoom=13&center=${this.state.cityData.lat},${this.state.cityData.lon}`} alt="placehold" />
+            <p>Lat: {this.state.cityData.lat}, Lon: {this.state.cityData.lon}</p>
+          </article>
+          }
+
+          {this.state.renderError && <p>{this.state.errorMessage}</p>}
+
         </main>
       </>
     );
