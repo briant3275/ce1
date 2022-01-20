@@ -32,7 +32,8 @@ Finish time: _____
 Actual time needed to complete: _____
 
 
-
+Lab 08 WRRC
+![Data Flow](01-19Diagram.png)
 
 
 
